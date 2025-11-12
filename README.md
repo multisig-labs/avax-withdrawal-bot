@@ -9,7 +9,7 @@ Production-ready Telegram bot that monitors Avalanche C-Chain withdrawal request
 - **Instant Alerts** - Immediate notifications when withdrawals become claimable
 - **Configurable Frequency** - 6h, 12h, or 24h notification intervals
 - **Production Hardened** - RPC failover, rate limiting, persistent storage
-- **Zero Native Dependencies** - JSON-based storage works everywhere
+- **SQLite Database** - Scalable persistent storage using Drizzle ORM
 
 ## Quick Start
 
@@ -93,12 +93,22 @@ See `frontend-integration.html` for complete example.
 
 ### Persistent Storage
 
-JSON file at `data/bot-data.json` stores:
+SQLite database at `data/bot-data.sqlite` stores:
 - Subscriptions
 - Notification history
 - Completion status
 
-Automatically saved on every change. Backup by copying `data/` directory.
+Automatically managed by Drizzle ORM. Backup by copying `data/` directory.
+
+### Migrating from JSON
+
+If you have existing JSON data at `data/bot-data.json`, run:
+
+```bash
+node src/migrate-to-sqlite.js
+```
+
+This will convert your JSON data to the new SQLite format.
 
 ### RPC Resilience
 
@@ -144,15 +154,19 @@ pm2 monit
 avax-withdrawal-bot/
 ├── src/
 │   ├── index.js              # Bot entry point
+│   ├── migrate-to-sqlite.js  # Migration utility
+│   ├── db/
+│   │   └── schema.js         # Database schema
 │   ├── services/
 │   │   ├── contract.js       # Contract interaction
-│   │   ├── json-store.js     # Persistent storage
+│   │   ├── db-store.js       # SQLite storage (Drizzle ORM)
+│   │   ├── json-store.js     # Legacy JSON storage
 │   │   ├── poller.js         # Polling & notifications
 │   │   └── provider.js       # Resilient RPC provider
 │   └── utils/
 │       └── abi.js            # Contract ABI
 ├── data/
-│   └── bot-data.json         # Persistent data
+│   └── bot-data.sqlite       # Persistent database
 ├── frontend-integration.html # Integration example
 ├── .env                      # Configuration
 └── package.json
@@ -161,7 +175,7 @@ avax-withdrawal-bot/
 ## Performance
 
 - **RPC Calls**: 4 per hour (93% reduction vs 1-minute polling)
-- **Storage**: ~500 bytes per subscription
+- **Storage**: ~200 bytes per subscription (SQLite with indexes)
 - **Latency**: 100-500ms normal, 1-5s with retry
 - **Success Rate**: >99.9% with failover
 

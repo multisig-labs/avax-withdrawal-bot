@@ -19,8 +19,13 @@
   "license": "MIT",
   "dependencies": {
     "@grammyjs/ratelimiter": "^1.2.0",
+    "better-sqlite3": "^12.4.1",
     "dotenv": "^16.4.1",
+    "drizzle-orm": "^0.44.7",
     "ethers": "^6.10.0",
     "grammy": "^1.21.1"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.6"
   }
 }

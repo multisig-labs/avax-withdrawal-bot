@@ -3,7 +3,7 @@ import { Bot } from 'grammy';
 import { limit } from '@grammyjs/ratelimiter';
 import { ethers } from 'ethers';
 import { ContractService } from './services/contract.js';
-import { JsonStore } from './services/json-store.js';
+import { DbStore } from './services/db-store.js';
 import { PollerService } from './services/poller.js';
 
 // Configuration
@@ -28,7 +28,7 @@ const FREQUENCY_OPTIONS = {
 
 const bot = new Bot(BOT_TOKEN);
 const contractService = new ContractService(RPC_URL, CONTRACT_ADDRESS, FALLBACK_RPC_URLS);
-const store = new JsonStore();
+const store = new DbStore();
 const poller = new PollerService(contractService, store, bot, POLL_INTERVAL_MS);
 
 bot.use(
